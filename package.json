@@ -1,0 +1,53 @@
+{
+  "name": "conviction-voting-discord-bot",
+  "version": "1.0.0",
+  "description": "A Discord bot that notifies about proposals",
+  "main": "src/index.ts",
+  "scripts": {
+    "start": "npm run build && node ./dist/index.js",
+    "dev": "ts-node-dev --watch --respawn --transpile-only ./src/index.ts",
+    "build": "tsc --build",
+    "lint": "eslint . --ext .ts",
+    "prettier-format": "prettier --config .prettierrc 'src/**/*.ts' --write"
+  },
+  "keywords": [
+    "1Hive",
+    "Conviction",
+    "Voting",
+    "Discord.js"
+  ],
+  "author": "1Hive",
+  "license": "MIT",
+  "dependencies": {
+    "@apollo/client": "^3.4.15",
+    "cron": "^1.8.2",
+    "cross-fetch": "^3.1.4",
+    "discord.js": "^13.1.0",
+    "dotenv": "^10.0.0",
+    "ethers": "^5.4.7",
+    "graphql": "^15.6.0",
+    "graphql-tag": "^2.12.5"
+  },
+  "devDependencies": {
+    "@types/cron": "^1.7.3",
+    "@types/node": "^16.10.2",
+    "@typescript-eslint/eslint-plugin": "^4.32.0",
+    "@typescript-eslint/parser": "^4.32.0",
+    "eslint": "^7.32.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-prettier": "^4.0.0",
+    "husky": "^7.0.2",
+    "nodemon": "^2.0.13",
+    "prettier": "^2.4.1",
+    "ts-node-dev": "^1.1.8",
+    "typescript": "^4.4.3"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run prettier-format && npm run lint"
+    }
+  },
+  "engines": {
+    "node": ">=16.6.0"
+  }
+}

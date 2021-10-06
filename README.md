@@ -2,7 +2,11 @@
 
 A Discord bot that notifies about proposals
 
-## Developer quick start 👩‍💻
+## Preview
+
+![Proposal bot preview](https://imgur.com/wqaNSIq.png)
+
+### Developer quick start 👩‍💻
 
 - `npm start`: Starts up the bot without hot reloading.
 - `npm run dev` will launch the bot locally, with hot reloading included.

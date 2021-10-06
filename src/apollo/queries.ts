@@ -18,3 +18,16 @@ export const ACTIVE_PROPOSALS_QUERY = gql`
     }
   }
 `;
+
+export const CONVICTION_PARAMS_QUERY = gql`
+  query ConvictionParams {
+    convictionConfigs(first: 1, orderBy: id, orderDirection: desc) {
+      weight
+      decay
+      pctBase
+      maxRatio
+      minThresholdStakePercentage
+      totalStaked
+    }
+  }
+`;

@@ -1,4 +1,4 @@
-import { ApolloClient, InMemoryCache, HttpLink } from '@apollo/client';
+import { ApolloClient, InMemoryCache, HttpLink } from '@apollo/client/core';
 import fetch from 'cross-fetch';
 
 const HONEYPOT_SUBGRAPH =

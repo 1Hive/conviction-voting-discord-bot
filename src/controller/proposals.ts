@@ -1,12 +1,21 @@
 import { Client } from 'discord.js';
 import { ethers } from 'ethers';
 import { config } from 'dotenv';
+import { CronJob } from 'cron';
+import BigNumber from '../lib/bigNumber';
 
 import { RINKEBY_CONVICTION_VOTING_CONTRACT } from '../constants';
 import ConvictionVotingABI from '../abis/ConvictionVoting.json';
 import { proposalAddedEmbed } from '../embed';
-import { fetchProposalTitle, fetchActiveProposals } from './subgraphFetcher';
-import { CronJob } from 'cron';
+import {
+  fetchProposalTitle,
+  fetchActiveProposals,
+  fetchConvictionParams
+} from './subgraphFetcher';
+import {
+  fetchTokenTotalSupply,
+  fetchCommonPoolBalance
+} from './tokenInformationFetcher';
 
 config();
 
@@ -82,14 +91,68 @@ export default async function getProposals(client: Client): Promise<void> {
 
     // Cron job to check and notify if any active proposal
     // has passed and it's ready to be executed
-    const passedProposalsCheckerJob = new CronJob('0 * * * *', async () => {
+    const passedProposalsCheckerJob = new CronJob('*/5 * * * * *', async () => {
       const activeProposals = await fetchActiveProposals();
-      if (!activeProposals) return;
+      const convictionParams = await fetchConvictionParams();
+      const totalSupply = await fetchTokenTotalSupply();
+      const commonPoolBalance = await fetchCommonPoolBalance();
 
+      if (
+        !activeProposals ||
+        !convictionParams ||
+        !totalSupply ||
+        !commonPoolBalance
+      )
+        return;
+
+      const {
+        decay,
+        maxRatio,
+        minThresholdStakePercentage,
+        pctBase,
+        totalStaked,
+        weight
+      } = convictionParams;
+      console.log(convictionParams);
       activeProposals.forEach((proposal) => {
         if (!proposal.convictionLast) return;
 
-        // calculate threshold for proposals here
+        // TODO:
+        // - calculate threshold for proposals here
+        const oneBN = new BigNumber('1');
+        const oneEth = new BigNumber(1e18);
+        const alpha = decay.dividedBy(pctBase);
+
+        const share = proposal.requestedAmount.dividedBy(commonPoolBalance);
+
+        const percentageOfTotalSupply = totalSupply
+          .multipliedBy(minThresholdStakePercentage)
+          .dividedBy(oneEth);
+
+        const effectiveSupply = totalStaked.isLessThan(percentageOfTotalSupply)
+          ? percentageOfTotalSupply
+          : totalStaked;
+
+        // Calculate threshold for proposals
+        const threshold = weight
+          .multipliedBy(effectiveSupply)
+          .dividedBy(oneBN.minus(alpha))
+          .dividedBy(maxRatio.minus(share).pow(2))
+
+        console.log(proposal.metadata);
+        console.log(threshold.toString());
+
+        const minStake = alpha
+          .negated()
+          .multipliedBy(threshold)
+          .plus(threshold)
+          .dividedBy(oneEth);
+
+        console.log(`max ratio: ${maxRatio.toString()}\nshare: ${share.toString()}`);
+        console.log(`min stake: ${minStake.toString()}`);
+        console.log(`pctTotalSupply: ${percentageOfTotalSupply.toString()}\ntotal staked: ${totalStaked.toString()}`)
+
+        // Try using the Bignumber.js library.
       });
     });
     passedProposalsCheckerJob.start();

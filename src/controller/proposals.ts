@@ -4,7 +4,7 @@ import { config } from 'dotenv';
 import { CronJob } from 'cron';
 import BigNumber from '../lib/bigNumber';
 
-import { RINKEBY_CONVICTION_VOTING_CONTRACT } from '../constants';
+import { XDAI_CONVICTION_VOTING_CONTRACT } from '../constants';
 import ConvictionVotingABI from '../abis/ConvictionVoting.json';
 import { proposalAddedEmbed } from '../embed';
 import {
@@ -32,7 +32,7 @@ export default async function getProposals(client: Client): Promise<void> {
     // Connect to contract
     const provider = ethers.providers.getDefaultProvider(process.env.PROVIDER);
     const contract = new ethers.Contract(
-      RINKEBY_CONVICTION_VOTING_CONTRACT,
+      XDAI_CONVICTION_VOTING_CONTRACT,
       ConvictionVotingABI,
       provider
     );
@@ -90,8 +90,8 @@ export default async function getProposals(client: Client): Promise<void> {
     });
 
     // Cron job to check and notify if any active proposal
-    // has passed and it's ready to be executed
-    const passedProposalsCheckerJob = new CronJob('*/5 * * * * *', async () => {
+    // has passed and it's ready to be executed, runs every 15 minutes
+    const passedProposalsCheckerJob = new CronJob('*/15 * * * *', async () => {
       const activeProposals = await fetchActiveProposals();
       const convictionParams = await fetchConvictionParams();
       const totalSupply = await fetchTokenTotalSupply();
@@ -113,46 +113,43 @@ export default async function getProposals(client: Client): Promise<void> {
         totalStaked,
         weight
       } = convictionParams;
-      console.log(convictionParams);
+
+      const oneBN = new BigNumber('1');
+      const oneEth = new BigNumber(1e18);
+      const alpha = decay.dividedBy(pctBase);
+
+      const percentageOfTotalSupply = totalSupply
+        .multipliedBy(minThresholdStakePercentage)
+        .dividedBy(oneEth);
+
+      const effectiveSupply = totalStaked.isLessThan(percentageOfTotalSupply)
+        ? percentageOfTotalSupply
+        : totalStaked;
+
       activeProposals.forEach((proposal) => {
         if (!proposal.convictionLast) return;
 
-        // TODO:
-        // - calculate threshold for proposals here
-        const oneBN = new BigNumber('1');
-        const oneEth = new BigNumber(1e18);
-        const alpha = decay.dividedBy(pctBase);
-
         const share = proposal.requestedAmount.dividedBy(commonPoolBalance);
-
-        const percentageOfTotalSupply = totalSupply
-          .multipliedBy(minThresholdStakePercentage)
-          .dividedBy(oneEth);
-
-        const effectiveSupply = totalStaked.isLessThan(percentageOfTotalSupply)
-          ? percentageOfTotalSupply
-          : totalStaked;
 
         // Calculate threshold for proposals
         const threshold = weight
           .multipliedBy(effectiveSupply)
           .dividedBy(oneBN.minus(alpha))
-          .dividedBy(maxRatio.minus(share).pow(2))
+          .dividedBy(maxRatio.minus(share).pow(2));
 
-        console.log(proposal.metadata);
-        console.log(threshold.toString());
+        /* Minimum amount of tokens staked in a proposal for
+         * it to be able to pass after a certain time
+         */
+        // const minStake = alpha
+        //   .negated()
+        //   .multipliedBy(threshold)
+        //   .plus(threshold)
+        //   .dividedBy(oneEth);
 
-        const minStake = alpha
-          .negated()
-          .multipliedBy(threshold)
-          .plus(threshold)
-          .dividedBy(oneEth);
-
-        console.log(`max ratio: ${maxRatio.toString()}\nshare: ${share.toString()}`);
-        console.log(`min stake: ${minStake.toString()}`);
-        console.log(`pctTotalSupply: ${percentageOfTotalSupply.toString()}\ntotal staked: ${totalStaked.toString()}`)
-
-        // Try using the Bignumber.js library.
+        if (proposal.convictionLast.gte(threshold))
+          proposalsChannel.send(
+            `Proposal ${proposal.number} - ${proposal.metadata} has passed and it's ready to be executed, you can do so here https://1hive.org/#/proposal/${proposal.number}`
+          );
       });
     });
     passedProposalsCheckerJob.start();

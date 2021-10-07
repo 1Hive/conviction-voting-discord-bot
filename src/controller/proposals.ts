@@ -40,7 +40,7 @@ export default async function getProposals(client: Client): Promise<void> {
     // Add event listeners to contract
     contract.on(
       'StakeAdded',
-      () => console.log('Stake added')
+      () => proposalsChannel.send('Testing channel')
     );
     
     contract.on(

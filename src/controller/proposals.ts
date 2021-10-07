@@ -39,6 +39,11 @@ export default async function getProposals(client: Client): Promise<void> {
 
     // Add event listeners to contract
     contract.on(
+      'StakeAdded',
+      () => console.log('Stake added')
+    );
+    
+    contract.on(
       'ProposalAdded',
       (
         creator,

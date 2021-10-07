@@ -39,11 +39,6 @@ export default async function getProposals(client: Client): Promise<void> {
 
     // Add event listeners to contract
     contract.on(
-      'StakeAdded',
-      () => proposalsChannel.send('Testing channel')
-    );
-    
-    contract.on(
       'ProposalAdded',
       (
         creator,
@@ -69,6 +64,7 @@ export default async function getProposals(client: Client): Promise<void> {
             )
           ]
         });
+        console.log(`Proposal added ${proposalId} - ${title}`);
       }
     );
 

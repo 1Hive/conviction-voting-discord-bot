@@ -10,8 +10,8 @@ export const proposalAddedEmbed = (
   return new MessageEmbed({
     color: 16769024,
     title,
-    url: `https://1hive.org/#/proposal/${proposalId}`,
-    description: `A new proposal has been created, [go vote for it here](https://1hive.org/#/proposal/${proposalId})`,
+    url: `https://gardens.1hive.org/#/xdai/garden/0x8ccbeab14b5ac4a431fffc39f4bec4089020a155/proposal/${proposalId}`,
+    description: `A new proposal has been created, [go vote for it here](https://gardens.1hive.org/#/xdai/garden/0x8ccbeab14b5ac4a431fffc39f4bec4089020a155/proposal/${proposalId})`,
     fields: [
       {
         name: 'Type',

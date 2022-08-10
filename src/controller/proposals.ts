@@ -90,8 +90,8 @@ export default async function getProposals(client: Client): Promise<void> {
     });
 
     // Cron job to check and notify if any active proposal
-    // has passed and it's ready to be executed, runs every 15 minutes
-    const passedProposalsCheckerJob = new CronJob('*/15 * * * *', async () => {
+    // has passed and it's ready to be executed, runs every 60 minutes
+    const passedProposalsCheckerJob = new CronJob('*/60 * * * *', async () => {
       const activeProposals = await fetchActiveProposals();
       const convictionParams = await fetchConvictionParams();
       const totalSupply = await fetchTokenTotalSupply();

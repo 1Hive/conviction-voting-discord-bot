@@ -1,7 +1,7 @@
 {
   "name": "conviction-voting-discord-bot",
   "version": "1.0.0",
-  "description": "A Discord bot that notifies about proposals",
+  "description": "A Discord bot that notifies about gardens proposals",
   "main": "src/index.ts",
   "scripts": {
     "start": "npm run build && node ./dist/index.js",
@@ -12,6 +12,7 @@
   },
   "keywords": [
     "1Hive",
+    "Gardens",
     "Conviction",
     "Voting",
     "Discord.js"

@@ -12,7 +12,7 @@ export const fetchProposalTitle = async (id: number): Promise<string> => {
   try {
     const result = await graphqlClient.query({
       query: PROPOSAL_TITLE_QUERY,
-      variables: { number: id }
+      variables: { garden: process.env.GARDEN_ADDRESS, number: id }
     });
 
     if (!result.data || !result.data.proposals.length)
@@ -33,7 +33,10 @@ interface Proposal {
 
 export const fetchActiveProposals = async (): Promise<Proposal[]> => {
   try {
-    const result = await graphqlClient.query({ query: ACTIVE_PROPOSALS_QUERY });
+    const result = await graphqlClient.query({
+      query: ACTIVE_PROPOSALS_QUERY,
+      variables: { garden: process.env.GARDEN_ADDRESS }
+    });
     if (!result.data || !result.data.proposals.length) return undefined;
 
     return result.data.proposals.map((proposal) => ({
@@ -59,12 +62,13 @@ interface ConvictionParams {
 export const fetchConvictionParams = async (): Promise<ConvictionParams> => {
   try {
     const result = await graphqlClient.query({
-      query: CONVICTION_PARAMS_QUERY
+      query: CONVICTION_PARAMS_QUERY,
+      variables: { garden: process.env.GARDEN_ADDRESS }
     });
 
-    if (!result.data || !result.data.convictionConfigs.length) return undefined;
+    if (!result.data || !result.data.organization) return undefined;
 
-    const convictionParams = result.data.convictionConfigs[0];
+    const convictionParams = result.data.organization.config.conviction;
 
     return {
       decay: new BigNumber(convictionParams.decay),

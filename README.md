@@ -22,3 +22,11 @@ For the bot to run properly, it needs these variables, laid out in the `.env.sam
 - `GUILD_ID`: Your Discord server ID.
 - `PROPOSALS_CHANNEL`: The ID of the proposals feed channel.
 - `PROVIDER`: Your Ethereum provider.
+
+Garden specific configuration:
+
+- `GARDEN_ADDRESS`: Your Garden address.
+- `GARDEN_REQUEST_TOKEN_SYMBOL`: Request token symbol (e.g HNY).
+- `GARDEN_REQUEST_TOKEN_ADDRESS`: Request token address.
+- `GARDEN_COMMON_POOL_ADDRESS`: Common Pool address of the Garden.
+- `GARDEN_CONVICTION_VOTING_ADDRESS`: Conviction Voting address of the Garden.

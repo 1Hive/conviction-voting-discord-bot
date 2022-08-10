@@ -4,7 +4,6 @@ import { config } from 'dotenv';
 import { CronJob } from 'cron';
 import BigNumber from '../lib/bigNumber';
 
-import { XDAI_CONVICTION_VOTING_CONTRACT } from '../constants';
 import ConvictionVotingABI from '../abis/ConvictionVoting.json';
 import { proposalAddedEmbed } from '../embed';
 import {
@@ -32,7 +31,7 @@ export default async function getProposals(client: Client): Promise<void> {
     // Connect to contract
     const provider = ethers.providers.getDefaultProvider(process.env.PROVIDER);
     const contract = new ethers.Contract(
-      XDAI_CONVICTION_VOTING_CONTRACT,
+      process.env.GARDEN_CONVICTION_VOTING_ADDRESS,
       ConvictionVotingABI,
       provider
     );
@@ -149,7 +148,7 @@ export default async function getProposals(client: Client): Promise<void> {
 
         if (proposal.convictionLast.gte(threshold))
           proposalsChannel.send(
-            `Proposal ${proposal.number} - ${proposal.metadata} has passed and it's ready to be executed, you can do so here https://1hive.org/#/proposal/${proposal.number}`
+            `Proposal ${proposal.number} - ${proposal.metadata} has passed and it's ready to be executed, you can do so here https://gardens.1hive.org/#/xdai/garden/${process.env.GARDEN_ADDRESS}/proposal/${proposal.number}`
           );
       });
     });

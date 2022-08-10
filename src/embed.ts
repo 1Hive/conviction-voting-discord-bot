@@ -10,8 +10,8 @@ export const proposalAddedEmbed = (
   return new MessageEmbed({
     color: 16769024,
     title,
-    url: `https://gardens.1hive.org/#/xdai/garden/0x8ccbeab14b5ac4a431fffc39f4bec4089020a155/proposal/${proposalId}`,
-    description: `A new proposal has been created, [go vote for it here](https://gardens.1hive.org/#/xdai/garden/0x8ccbeab14b5ac4a431fffc39f4bec4089020a155/proposal/${proposalId})`,
+    url: `https://gardens.1hive.org/#/xdai/garden/${process.env.GARDEN_ADDRESS}/proposal/${proposalId}`,
+    description: `A new proposal has been created, [go vote for it here](https://gardens.1hive.org/#/xdai/garden/${process.env.GARDEN_ADDRESS}/proposal/${proposalId})`,
     fields: [
       {
         name: 'Type',
@@ -20,7 +20,9 @@ export const proposalAddedEmbed = (
       },
       {
         name: 'Requested amount',
-        value: `${amount} ${isStable ? 'xDAI' : 'HNY'}`,
+        value: `${amount} ${
+          isStable ? 'xDAI' : process.env.GARDEN_REQUEST_TOKEN_SYMBOL
+        }`,
         inline: true
       },
       {

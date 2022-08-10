@@ -146,10 +146,10 @@ export default async function getProposals(client: Client): Promise<void> {
         //   .plus(threshold)
         //   .dividedBy(oneEth);
 
-        if (proposal.convictionLast.gte(threshold))
-          proposalsChannel.send(
-            `Proposal ${proposal.number} - ${proposal.metadata} has passed and it's ready to be executed, you can do so here https://gardens.1hive.org/#/xdai/garden/${process.env.GARDEN_ADDRESS}/proposal/${proposal.number}`
-          );
+        // if (proposal.convictionLast.gte(threshold))
+        //   proposalsChannel.send(
+        //     `Proposal ${proposal.number} - ${proposal.metadata} has passed and it's ready to be executed, you can do so here https://gardens.1hive.org/#/xdai/garden/${process.env.GARDEN_ADDRESS}/proposal/${proposal.number}`
+        //   );
       });
     });
     passedProposalsCheckerJob.start();
